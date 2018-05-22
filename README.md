@@ -15,5 +15,6 @@ Hello
     $ sam --version
     
 Deploy
-    
+
+    $ npom
 

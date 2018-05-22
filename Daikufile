@@ -24,8 +24,8 @@ my $PACKAGE_JSON = << "PACKAGE_JSON";
   ],
   "scripts": {
     "start": "sam local start-api",
-    "watch": "babel -w src -d dist",
-    "build": "babel src -d dist ",
+    "watch": "webpack --progress --watch --mode development",
+    "build": "webpack --mode production",
     "predeploy": "npm run build",
     "flow": "flow",
     "create": "aws s3 mb s3://%s --region ap-northeast-1",
