@@ -52,7 +52,7 @@ my $PACKAGE_JSON = << "PACKAGE_JSON";
 PACKAGE_JSON
 
 my $ENVRC = << 'ENVRC';
-export PATH=$PATH:`pwd`/node_modules/.bin
+export PATH=$PATH:`pwd`/node_modules/.bin:`pwd`/node_modules/aws-sam-local/node_modules/.bin
 ENVRC
 
 my $INDEX_JS_HANDLER = << 'INDEX_JS_HANDLER';
