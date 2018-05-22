@@ -1,0 +1,204 @@
+
+use Cwd 'getcwd';
+
+my $BABELRC = << "BABELRC";
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "8.10"
+      }
+    }]
+  ]
+}
+BABELRC
+
+my $PACKAGE_JSON = << "PACKAGE_JSON";
+{
+  "name": "%s",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "sam local start-api",
+    "watch": "babel -w src -d dist",
+    "build": "babel src -d dist ",
+    "predeploy": "npm run build",
+    "flow": "flow",
+    "create": "aws s3 mb s3://%s --region ap-northeast-1",
+    "package": "aws cloudformation package --template-file template.yaml --output-template-file serverless-output.yaml --s3-bucket %s"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "aws-sam-local": "^0.2.11",
+    "babel-cli": "6.26.0",
+    "babel-core": "6.26.0",
+    "babel-loader": "7.1.4",
+    "babel-preset-env": "1.7.0",
+    "flow-bin": "0.70.0",
+    "flow-typed": "2.4.0",
+    "webpack": "4.8.1",
+    "webpack-cli": "2.1.3"
+  },
+  "dependencies": {
+    "aws-sdk": "2.223.1"
+  }
+}
+PACKAGE_JSON
+
+my $ENVRC = << 'ENVRC';
+export PATH=$PATH:`pwd`/node_modules/.bin
+ENVRC
+
+my $INDEX_JS_HANDLER = << 'INDEX_JS_HANDLER';
+import * as AWS from 'aws-sdk';
+
+export function handler(event, context, callback) {
+    try {
+        console.log("success");
+        callback(null, { 
+                   statusCode: 200,
+                   body: "Hello nodejs"
+                }); 
+
+
+
+    } catch (err) {
+        console.error(err) 
+        callback(err);
+    }   
+}
+INDEX_JS_HANDLER
+
+my $TEST1_JSON = << 'TEST1_JSON';
+{
+    "name": "masakyst",
+    "key3": "12345"
+}
+TEST1_JSON
+
+
+my $FLOW_CONFIG = << 'FLOW_CONFIG';
+[ignore]
+.*/node_modules/.*
+.*/dist/.*
+
+[include]
+
+[libs]
+flow-typed
+
+[lints]
+
+[options]
+
+[strict]
+FLOW_CONFIG
+
+my $WEBPACK_CONFIG_JS = << 'WEBPACK_CONFIG_JS';
+module.exports = { 
+    target: 'node',
+    mode: 'production',
+
+    entry: {
+        index './src/index.js' 
+    },  
+
+    output: {
+        path: __dirname + '/dist',
+        filename: '[name].js',
+        libraryTarget: 'commonjs2',
+    },  
+
+    //devtool: '#inline-source-map',
+
+    module: {
+        rules: [
+            {   
+                test: /\.js$/,
+                loader: 'babel-loader',
+                exclude: /node_modules/
+            }   
+        ]   
+    }   
+};
+WEBPACK_CONFIG_JS
+
+my $SAM_TEMPLATE = << 'SAM_TEMPLATE';
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: My first serverless application.
+
+Resources:
+            
+  Products:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        ListProducts:
+          Type: Api
+          Properties:
+            Path: /products
+            Method: get
+SAM_TEMPLATE
+
+
+sub create_file {
+    my ($path, $source) = @_;
+    open my $fh, '>', $path or die qw/Can't open file: $!/;
+    print $fh $source;
+    close $fh;
+}
+
+namespace create => sub {
+    
+    desc 'create Lambda function files';
+    task nodejs => sub {
+        # setup git
+        {
+            sh q(git init);
+            create_file('.gitignore', "/dist\n/node_modules");
+        }
+        # setup nodejs/babel
+        {
+            create_file('.babelrc', $BABELRC);
+            create_file('.npmrc', "save-exact=true");
+            my $func_name = (split('/', getcwd))[-1];
+            create_file('package.json', sprintf($PACKAGE_JSON, $func_name, $func_name, $func_name));
+            sh q(npm install);
+        }
+        # setup direnv
+        {
+            create_file('.envrc', $ENVRC);
+            sh q(direnv allow);
+        }
+        # index.js handler
+        {
+            sh q(mkdir src);
+            create_file('./src/index.js', $INDEX_JS_HANDLER);
+            sh q(mkdir tests);
+            create_file('./tests/event.json', $TEST1_JSON);
+            create_file('./webpack.config.js', $WEBPACK_CONFIG_JS);
+        }
+        # flow!
+        {
+            # sh q(npm run flow init);
+            create_file('.flowconfig', $FLOW_CONFIG);
+        }
+        # sam
+        {
+            create_file('template.yaml', $SAM_TEMPLATE);
+        }
+        # bye!!
+        sh q(rm ./Daikufile);
+    };
+
+};
