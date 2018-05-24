@@ -16,5 +16,8 @@ Hello
     
 Deploy
 
-    $ npom
+    $ npm run build  # server-side webpack
+    $ npm run create # create s3 bucket
+    $ npm run package # cloudformation package
+    $ npm run deploy
 
