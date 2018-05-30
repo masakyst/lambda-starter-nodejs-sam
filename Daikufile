@@ -140,6 +140,23 @@ AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: My first serverless application.
 
+#Parameters:
+#  Env:
+#    Type: String
+#    AllowedValues:
+#      - prod
+#      - dev
+#    Default: dev
+
+#Mappings:
+#  EnvMap:
+#    prod:
+#      TwitterAccessToken: ''
+#      TwitterAccessTokenSecret: ''
+#    stg:
+#      TwitterAccessToken: ''
+#      TwitterA
+
 Resources:
             
   Products:
@@ -148,12 +165,28 @@ Resources:
       CodeUri: dist/
       Handler: index.handler
       Runtime: nodejs8.10
+      MemorySize: 128 
+      Timeout: 10
+      #Environment:
+      #  Variables:
+      #    DYNAMO_REGION: "ap-northeast-1"
+
       Events:
         ListProducts:
           Type: Api
           Properties:
             Path: /products
             Method: get
+
+      #Policies:
+      #  - Version: '2012-10-17'
+      #    Statement:
+      #      - Effect: Allow
+      #        Action:
+      #          - 'dynamodb:Query'
+      #          - 'dynamodb:GetItem'
+      #        Resource:
+      #          - 'arn:aws:dynamodb:ap-northeast-1:*'
 SAM_TEMPLATE
 
 
