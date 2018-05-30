@@ -4,6 +4,7 @@ use Cwd 'getcwd';
 my $BABELRC = << "BABELRC";
 {
   "presets": [
+    "flow",
     ["env", {
       "targets": {
         "node": "8.10"
