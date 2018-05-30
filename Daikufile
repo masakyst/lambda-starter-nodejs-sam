@@ -204,7 +204,7 @@ namespace create => sub {
         # setup git
         {
             sh q(git init);
-            create_file('.gitignore', "/dist\n/node_modules");
+            create_file('.gitignore', ".idea\n/dist\n/node_modules");
         }
         # setup nodejs/babel
         {
