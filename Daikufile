@@ -24,14 +24,16 @@ my $PACKAGE_JSON = << "PACKAGE_JSON";
     "dist"
   ],
   "scripts": {
-    "start": "sam local start-api",
+    "start": "run-p watch startapi",
+    "startapi": "sam local start-api",
     "watch": "webpack --progress --watch --mode development",
     "build": "webpack --mode production",
     "predeploy": "npm run build",
     "flow": "flow",
     "create": "aws s3 mb s3://%s --region ap-northeast-1",
     "package": "aws cloudformation package --template-file template.yaml --output-template-file serverless-output.yaml --s3-bucket %s",
-    "deploy": "aws cloudformation deploy --template-file serverless-output.yaml --stack-name %s-stack --capabilities CAPABILITY_IAM"
+    "deploy": "aws cloudformation deploy --template-file serverless-output.yaml --stack-name %s-stack --capabilities CAPABILITY_IAM",
+    "clean": "rm ./dist/index.js"
   },
   "keywords": [],
   "author": "",
