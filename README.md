@@ -13,11 +13,14 @@ Hello
 
     $ babel --version
     $ sam --version
-    
+
+Start local server
+
+    $ npm start
+
 Deploy
 
-    $ npm run build  # server-side webpack
-    $ npm run create # create s3 bucket
-    $ npm run package # cloudformation package
-    $ npm run deploy
+    $ npm run app:create
+    $ npm run app:package
+    $ npm run app:deploy 
 
