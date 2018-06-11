@@ -26,8 +26,8 @@ my $PACKAGE_JSON = << "PACKAGE_JSON";
   "scripts": {
     "start": "run-p watch startapi",
     "startapi": "sam local start-api",
-    "watch": "run-s __babel:devel __dist:cp_packagejson __dist:npminstall",
-    "build": "run-s __babel:prod __dist:cp_packagejson __dist:npminstall",
+    "watch": "run-s __dist:cp_packagejson __dist:npminstall __babel:devel",
+    "build": "run-s __dist:cp_packagejson __dist:npminstall __babel:prod",
     "flow": "flow",
     "clean": "rm ./dist/index.js",
     "app:create": "run-s __sam:s3create",
